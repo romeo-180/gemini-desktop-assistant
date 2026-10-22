@@ -11,6 +11,101 @@ from PyQt6.QtGui import QIcon, QPixmap, QPainter, QLinearGradient, QColor, QPain
 from google import genai
 from google.genai import types
 
+# === MULTILINGUAL & AUTO-VOICE MODULE (EN / RU) ===
+import os as _os, sys as _sys
+
+def _init_app_lang():
+    lang_file = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "lang.txt")
+    if _os.path.exists(lang_file):
+        try:
+            with open(lang_file, "r", encoding="utf-8") as f:
+                val = f.read().strip().lower()
+                if val in ("en", "ru"):
+                    return val
+        except Exception:
+            pass
+    try:
+        from PyQt6.QtWidgets import QApplication, QMessageBox
+        _app = QApplication.instance() or QApplication(_sys.argv)
+        msg = QMessageBox()
+        msg.setWindowTitle("Language / Язык")
+        msg.setText("Choose your language / Выберите язык интерфейса:")
+        btn_en = msg.addButton("🇺🇸 English", QMessageBox.ButtonRole.AcceptRole)
+        btn_ru = msg.addButton("🇷🇺 Русский", QMessageBox.ButtonRole.ActionRole)
+        msg.exec()
+        chosen = "ru" if msg.clickedButton() == btn_ru else "en"
+        with open(lang_file, "w", encoding="utf-8") as f:
+            f.write(chosen)
+        return chosen
+    except Exception:
+        return "en"
+
+APP_LANG = _init_app_lang()
+
+# 1. Автовыбор голоса озвучки (Русский -> Светлана, Английский -> Aria)
+try:
+    import edge_tts as _edge_tts
+    _orig_comm_init = _edge_tts.Communicate.__init__
+    def _smart_comm_init(self, text, voice="ru-RU-SvetlanaNeural", *args, **kwargs):
+        has_cyrillic = any("а" <= ch.lower() <= "я" or ch.lower() == "ё" for ch in str(text))
+        smart_voice = "ru-RU-SvetlanaNeural" if has_cyrillic else "en-US-AriaNeural"
+        return _orig_comm_init(self, text, smart_voice, *args, **kwargs)
+    _edge_tts.Communicate.__init__ = _smart_comm_init
+except Exception:
+    pass
+
+# 2. Автоперевод кнопок, меню и подсказок Qt при выборе English
+_EN_MAP = {
+    "🎙 Сказать": "🎙 Speak",
+    "🧹 Быстрая": "🧹 Fast Clean",
+    "🔥 Глубокая": "🔥 Deep Clean",
+    "👁 Экран": "👁 Screen",
+    "Отправить": "Send",
+    "Выход": "Exit",
+    "Открыть": "Open",
+    "Выключить звук": "Mute voice",
+    "Включить звук": "Unmute voice",
+    "Настройка Gemini API": "Gemini API Setup",
+    "Для работы ассистента нужен бесплатный ключ Gemini API.": "A free Gemini API key is required for the assistant.",
+    "🔑 Получить ключ бесплатно": "🔑 Get Free API Key",
+    "Ввести ключ": "Enter Key",
+    "Отмена": "Cancel",
+    "Ввод API ключа": "Enter API Key",
+    "Вставьте ваш Gemini API ключ (AIzaSy...):": "Paste your Gemini API key (AIzaSy...):"
+}
+
+def _tr_text(text):
+    if APP_LANG != "en" or not isinstance(text, str):
+        return text
+    res = text
+    for ru_k, en_v in _EN_MAP.items():
+        if ru_k in res:
+            res = res.replace(ru_k, en_v)
+    return res
+
+try:
+    from PyQt6.QtWidgets import QPushButton, QLabel, QMenu, QSystemTrayIcon
+    _orig_btn_init = QPushButton.__init__
+    def _tr_btn_init(self, *args, **kwargs):
+        args = tuple(_tr_text(a) for a in args)
+        _orig_btn_init(self, *args, **kwargs)
+    QPushButton.__init__ = _tr_btn_init
+
+    _orig_btn_set = QPushButton.setText
+    def _tr_btn_set(self, text):
+        _orig_btn_set(self, _tr_text(text))
+    QPushButton.setText = _tr_btn_set
+
+    _orig_menu_add = QMenu.addAction
+    def _tr_menu_add(self, *args, **kwargs):
+        args = tuple(_tr_text(a) for a in args)
+        return _orig_menu_add(self, *args, **kwargs)
+    QMenu.addAction = _tr_menu_add
+except Exception:
+    pass
+# === END MULTILINGUAL MODULE ===
+
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATS_FILE = os.path.join(BASE_DIR, "stats.json")
 KEY_FILE = os.path.join(BASE_DIR, "gemini_key.txt")
