@@ -659,3 +659,25 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def ensure_autostart():
+    try:
+        if sys.platform == "win32":
+            import winreg
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run", 0, winreg.KEY_SET_VALUE)
+            cmd = f'"{sys.executable}"' if getattr(sys, 'frozen', False) else f'"{sys.executable}" "{os.path.abspath(__file__)}"'
+            winreg.SetValueEx(key, "GeminiAgent", 0, winreg.REG_SZ, cmd)
+            winreg.CloseKey(key)
+        else:
+            autostart_dir = os.path.expanduser("~/.config/autostart")
+            os.makedirs(autostart_dir, exist_ok=True)
+            desktop_path = os.path.join(autostart_dir, "gemini-agent.desktop")
+            if not os.path.exists(desktop_path):
+                exec_cmd = sys.executable if getattr(sys, 'frozen', False) else f"{sys.executable} {os.path.abspath(__file__)}"
+                content = f"[Desktop Entry]\nType=Application\nName=Gemini Agent\nExec={exec_cmd}\nTerminal=false\n"
+                with open(desktop_path, "w", encoding="utf-8") as df:
+                    df.write(content)
+    except Exception:
+        pass
+ensure_autostart()
