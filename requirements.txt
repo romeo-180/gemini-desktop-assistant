@@ -1,0 +1,9 @@
+﻿PyQt6
+google-genai
+psutil
+sounddevice
+numpy
+pygame
+edge-tts
+vosk
+pywin32

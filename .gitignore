@@ -1,0 +1,10 @@
+﻿venv/
+__pycache__/
+*.pyc
+gemini_key.txt
+stats.json
+chat_history.json
+*.mp3
+*.wav
+*.png
+*.lock
