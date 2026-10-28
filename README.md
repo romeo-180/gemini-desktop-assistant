@@ -15,7 +15,7 @@ Smart voice & system AI assistant powered by **Google Gemini** living in your sy
 
 **Option 2 — 1-Line PowerShell Installer:**
 ```powershell
-irm https://raw.githubusercontent.com/romeo-180/gemini-windows-agent/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/romeo-180/gemini-desktop-assistant/main/install.ps1 | iex
 ```
 
 ---
@@ -23,7 +23,7 @@ irm https://raw.githubusercontent.com/romeo-180/gemini-windows-agent/main/instal
 ### 🐧 Linux (Arch Linux, Ubuntu, Debian, Fedora)
 Open your terminal and run this single command:
 ```bash
-curl -sSL https://raw.githubusercontent.com/romeo-180/gemini-windows-agent/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/romeo-180/gemini-desktop-assistant/main/install.sh | bash
 ```
 The installer automatically detects your distro (`pacman`, `apt`, or `dnf`), installs required packages, creates an app menu shortcut, enables autostart, and prompts for your language and API key.
 
