@@ -15,7 +15,7 @@
 
 **Способ 2 — Установка одной командой в PowerShell:**
 ```powershell
-irm https://raw.githubusercontent.com/romeo-180/gemini-windows-agent/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/romeo-180/gemini-desktop-assistant/main/install.ps1 | iex
 ```
 
 ---
@@ -23,7 +23,7 @@ irm https://raw.githubusercontent.com/romeo-180/gemini-windows-agent/main/instal
 ### 🐧 Linux (Arch Linux, Ubuntu, Debian, Fedora)
 Откройте терминал и вставьте одну команду:
 ```bash
-curl -sSL https://raw.githubusercontent.com/romeo-180/gemini-windows-agent/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/romeo-180/gemini-desktop-assistant/main/install.sh | bash
 ```
 Скрипт сам определит ваш дистрибутив (`pacman`, `apt` или `dnf`), установит пакеты, добавит ярлык в меню программ, настроит автозапуск и предложит выбрать язык и ввести API-ключ.
 
